@@ -14,11 +14,30 @@ dns:
     - 8.8.4.4
     - tls://1.0.0.1:853
     - tls://dns.google:853
-proxies: ~
+proxies:
+  - {name: 🇹🇼 中国-台湾IEPL Hinet固接 D08 💩小铭💩, server: tw18.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇹🇼 中国-台湾宜兰 IPLC D08 💩小铭💩, server: tw08.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇯🇵 中国-日本 多协议标签交换虚拟专用网 D8 1000Mbps 💩小铭💩, server: hr08.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇬🇧 中国-英国伦敦电信 IEPL D2 💩小铭💩, server: uk02.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩, server: kr02.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇭🇰 中国-香港 IEPL Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩, server: hk08.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇭🇰 中国-香港 IPLC Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩, server: sg08.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇩🇪 德国 H2 💩小铭💩, server: ge02.htz.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩, server: sgp02.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩, server: sgp07.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩, server: sgp12.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇯🇵 日本 まつやまし auひかり ホーム1ギガ D 08 💩小铭💩, server: jp08.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇺🇸 美国实验性 IEPL 中继 D05💩小铭💩, server: us10.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇺🇸 美国高级 IEPL 中继 D05💩小铭💩, server: us05.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇰🇷 韩国 전라북도 전주시 商宽 D 02 💩小铭💩, server: kr12.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
+  - {name: 🇰🇷 韩国 전라북도 전주시 商宽 D 12 💩小铭💩, server: kr22.ktp.wtf, port: 48682, client-fingerprint: chrome, type: ssr, cipher: rc4-md5, password: qd2cd4z4ze, protocol: origin, obfs: http_simple, protocol-param: "", obfs-param: download.windowsupdate.com}
 proxy-groups:
   - name: 🚀 节点选择
     type: select
     proxies:
+      - ♻️ 自动选择
+      - 🔯 故障转移
+      - 🔮 负载均衡
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
       - 🇸🇬 狮城节点
@@ -30,11 +49,94 @@ proxy-groups:
   - name: 🚀 手动切换
     type: select
     proxies:
-      - DIRECT
+      - 🇹🇼 中国-台湾IEPL Hinet固接 D08 💩小铭💩
+      - 🇹🇼 中国-台湾宜兰 IPLC D08 💩小铭💩
+      - 🇯🇵 中国-日本 多协议标签交换虚拟专用网 D8 1000Mbps 💩小铭💩
+      - 🇬🇧 中国-英国伦敦电信 IEPL D2 💩小铭💩
+      - 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩
+      - 🇭🇰 中国-香港 IEPL Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇭🇰 中国-香港 IPLC Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇩🇪 德国 H2 💩小铭💩
+      - 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇯🇵 日本 まつやまし auひかり ホーム1ギガ D 08 💩小铭💩
+      - 🇺🇸 美国实验性 IEPL 中继 D05💩小铭💩
+      - 🇺🇸 美国高级 IEPL 中继 D05💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 02 💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 12 💩小铭💩
+  - name: ♻️ 自动选择
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - 🇹🇼 中国-台湾IEPL Hinet固接 D08 💩小铭💩
+      - 🇹🇼 中国-台湾宜兰 IPLC D08 💩小铭💩
+      - 🇯🇵 中国-日本 多协议标签交换虚拟专用网 D8 1000Mbps 💩小铭💩
+      - 🇬🇧 中国-英国伦敦电信 IEPL D2 💩小铭💩
+      - 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩
+      - 🇭🇰 中国-香港 IEPL Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇭🇰 中国-香港 IPLC Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇩🇪 德国 H2 💩小铭💩
+      - 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇯🇵 日本 まつやまし auひかり ホーム1ギガ D 08 💩小铭💩
+      - 🇺🇸 美国实验性 IEPL 中继 D05💩小铭💩
+      - 🇺🇸 美国高级 IEPL 中继 D05💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 02 💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 12 💩小铭💩
+  - name: 🔯 故障转移
+    type: fallback
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - 🇹🇼 中国-台湾IEPL Hinet固接 D08 💩小铭💩
+      - 🇹🇼 中国-台湾宜兰 IPLC D08 💩小铭💩
+      - 🇯🇵 中国-日本 多协议标签交换虚拟专用网 D8 1000Mbps 💩小铭💩
+      - 🇬🇧 中国-英国伦敦电信 IEPL D2 💩小铭💩
+      - 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩
+      - 🇭🇰 中国-香港 IEPL Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇭🇰 中国-香港 IPLC Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇩🇪 德国 H2 💩小铭💩
+      - 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇯🇵 日本 まつやまし auひかり ホーム1ギガ D 08 💩小铭💩
+      - 🇺🇸 美国实验性 IEPL 中继 D05💩小铭💩
+      - 🇺🇸 美国高级 IEPL 中继 D05💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 02 💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 12 💩小铭💩
+  - name: 🔮 负载均衡
+    type: load-balance
+    strategy: consistent-hashing
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - 🇹🇼 中国-台湾IEPL Hinet固接 D08 💩小铭💩
+      - 🇹🇼 中国-台湾宜兰 IPLC D08 💩小铭💩
+      - 🇯🇵 中国-日本 多协议标签交换虚拟专用网 D8 1000Mbps 💩小铭💩
+      - 🇬🇧 中国-英国伦敦电信 IEPL D2 💩小铭💩
+      - 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩
+      - 🇭🇰 中国-香港 IEPL Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇭🇰 中国-香港 IPLC Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇩🇪 德国 H2 💩小铭💩
+      - 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇯🇵 日本 まつやまし auひかり ホーム1ギガ D 08 💩小铭💩
+      - 🇺🇸 美国实验性 IEPL 中继 D05💩小铭💩
+      - 🇺🇸 美国高级 IEPL 中继 D05💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 02 💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 12 💩小铭💩
   - name: 📲 电报消息
     type: select
     proxies:
       - 🚀 节点选择
+      - ♻️ 自动选择
       - 🇸🇬 狮城节点
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
@@ -47,6 +149,7 @@ proxy-groups:
     type: select
     proxies:
       - 🚀 节点选择
+      - ♻️ 自动选择
       - 🇸🇬 狮城节点
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
@@ -59,6 +162,7 @@ proxy-groups:
     type: select
     proxies:
       - 🚀 节点选择
+      - ♻️ 自动选择
       - 🇸🇬 狮城节点
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
@@ -72,6 +176,7 @@ proxy-groups:
     proxies:
       - 🎥 奈飞节点
       - 🚀 节点选择
+      - ♻️ 自动选择
       - 🇸🇬 狮城节点
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
@@ -97,6 +202,7 @@ proxy-groups:
     type: select
     proxies:
       - 🚀 节点选择
+      - ♻️ 自动选择
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
       - 🇸🇬 狮城节点
@@ -191,11 +297,13 @@ proxy-groups:
     proxies:
       - DIRECT
       - 🚀 节点选择
+      - ♻️ 自动选择
   - name: 🎯 全球直连
     type: select
     proxies:
       - DIRECT
       - 🚀 节点选择
+      - ♻️ 自动选择
   - name: 🛑 广告拦截
     type: select
     proxies:
@@ -210,6 +318,7 @@ proxy-groups:
     type: select
     proxies:
       - 🚀 节点选择
+      - ♻️ 自动选择
       - DIRECT
       - 🇭🇰 香港节点
       - 🇨🇳 台湾节点
@@ -219,33 +328,62 @@ proxy-groups:
       - 🇰🇷 韩国节点
       - 🚀 手动切换
   - name: 🇭🇰 香港节点
-    type: select
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
     proxies:
-      - DIRECT
+      - 🇭🇰 中国-香港 IEPL Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
+      - 🇭🇰 中国-香港 IPLC Equinix HK2 D 08 1Gbps HBO TVB 💩小铭💩
   - name: 🇯🇵 日本节点
-    type: select
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
     proxies:
-      - DIRECT
+      - 🇯🇵 中国-日本 多协议标签交换虚拟专用网 D8 1000Mbps 💩小铭💩
+      - 🇯🇵 日本 まつやまし auひかり ホーム1ギガ D 08 💩小铭💩
   - name: 🇺🇲 美国节点
-    type: select
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 150
     proxies:
-      - DIRECT
-  - name: 🇸🇬 狮城节点
-    type: select
-    proxies:
-      - DIRECT
+      - 🇺🇸 美国实验性 IEPL 中继 D05💩小铭💩
+      - 🇺🇸 美国高级 IEPL 中继 D05💩小铭💩
   - name: 🇨🇳 台湾节点
-    type: select
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
     proxies:
-      - DIRECT
+      - 🇹🇼 中国-台湾IEPL Hinet固接 D08 💩小铭💩
+      - 🇹🇼 中国-台湾宜兰 IPLC D08 💩小铭💩
+  - name: 🇸🇬 狮城节点
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩
   - name: 🇰🇷 韩国节点
-    type: select
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
     proxies:
-      - DIRECT
+      - 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 02 💩小铭💩
+      - 🇰🇷 韩国 전라북도 전주시 商宽 D 12 💩小铭💩
   - name: 🎥 奈飞节点
     type: select
     proxies:
-      - DIRECT
+      - 🇰🇷 中国-韩国 IPLC D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Legacy Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡 Magic IEPL 中继 D02 Netflix 💩小铭💩
+      - 🇸🇬 新加坡高级 IEPL 中继 D02 Netflix 💩小铭💩
 rules:
   - DOMAIN-SUFFIX,acl4.ssr,🎯 全球直连
   - DOMAIN-SUFFIX,ip6-localhost,🎯 全球直连
@@ -1995,7 +2133,6 @@ rules:
   - DOMAIN-SUFFIX,steamcontent.com,🎯 全球直连
   - DOMAIN-SUFFIX,steamusercontent.com,🎯 全球直连
   - DOMAIN-SUFFIX,bing.com,Ⓜ️ 微软Bing
-  - DOMAIN-SUFFIX,copilot.cloud.microsoft,Ⓜ️ 微软Bing
   - DOMAIN-SUFFIX,copilot.microsoft.com,Ⓜ️ 微软Bing
   - PROCESS-NAME,OneDrive,Ⓜ️ 微软云盘
   - PROCESS-NAME,OneDriveUpdater,Ⓜ️ 微软云盘
@@ -2128,7 +2265,6 @@ rules:
   - DOMAIN-SUFFIX,telegram.org,📲 电报消息
   - DOMAIN-SUFFIX,telesco.pe,📲 电报消息
   - IP-CIDR,91.108.0.0/16,📲 电报消息,no-resolve
-  - IP-CIDR,95.161.64.0/20,📲 电报消息,no-resolve
   - IP-CIDR,109.239.140.0/24,📲 电报消息,no-resolve
   - IP-CIDR,149.154.160.0/20,📲 电报消息,no-resolve
   - IP-CIDR6,2001:67c:4e8::/48,📲 电报消息,no-resolve
@@ -3442,7 +3578,6 @@ rules:
   - DOMAIN-SUFFIX,buzzhand.com,🚀 节点选择
   - DOMAIN-SUFFIX,buzzhand.net,🚀 节点选择
   - DOMAIN-SUFFIX,buzzorange.com,🚀 节点选择
-  - DOMAIN-SUFFIX,buzzsprout.com,🚀 节点选择
   - DOMAIN-SUFFIX,bvpn.com,🚀 节点选择
   - DOMAIN-SUFFIX,bwbx.io,🚀 节点选择
   - DOMAIN-SUFFIX,bwgyhw.com,🚀 节点选择
@@ -4278,7 +4413,6 @@ rules:
   - DOMAIN-SUFFIX,fa.gov.tw,🚀 节点选择
   - DOMAIN-SUFFIX,facebook.br,🚀 节点选择
   - DOMAIN-SUFFIX,facebook.com,🚀 节点选择
-  - DOMAIN-SUFFIX,facebook.de,🚀 节点选择
   - DOMAIN-SUFFIX,facebook.design,🚀 节点选择
   - DOMAIN-SUFFIX,facebook.hu,🚀 节点选择
   - DOMAIN-SUFFIX,facebook.in,🚀 节点选择
@@ -5524,7 +5658,6 @@ rules:
   - DOMAIN-SUFFIX,iuksky.com,🚀 节点选择
   - DOMAIN-SUFFIX,ivacy.com,🚀 节点选择
   - DOMAIN-SUFFIX,iverycd.com,🚀 节点选择
-  - DOMAIN-SUFFIX,ivonblog.com,🚀 节点选择
   - DOMAIN-SUFFIX,ivpn.net,🚀 节点选择
   - DOMAIN-SUFFIX,iwara.tv,🚀 节点选择
   - DOMAIN-SUFFIX,ixquick.com,🚀 节点选择
@@ -5541,7 +5674,6 @@ rules:
   - DOMAIN-SUFFIX,jamaat.org,🚀 节点选择
   - DOMAIN-SUFFIX,jamestown.org,🚀 节点选择
   - DOMAIN-SUFFIX,jamyangnorbu.com,🚀 节点选择
-  - DOMAIN-SUFFIX,jan.ai,🚀 节点选择
   - DOMAIN-SUFFIX,jandyx.com,🚀 节点选择
   - DOMAIN-SUFFIX,janwongphoto.com,🚀 节点选择
   - DOMAIN-SUFFIX,japan-whores.com,🚀 节点选择
@@ -6012,7 +6144,6 @@ rules:
   - DOMAIN-SUFFIX,meshrep.com,🚀 节点选择
   - DOMAIN-SUFFIX,mesotw.com,🚀 节点选择
   - DOMAIN-SUFFIX,messenger.com,🚀 节点选择
-  - DOMAIN-SUFFIX,meta.com,🚀 节点选择
   - DOMAIN-SUFFIX,metacafe.com,🚀 节点选择
   - DOMAIN-SUFFIX,metafilter.com,🚀 节点选择
   - DOMAIN-SUFFIX,metart.com,🚀 节点选择
@@ -6617,7 +6748,6 @@ rules:
   - DOMAIN-SUFFIX,partypoker.com,🚀 节点选择
   - DOMAIN-SUFFIX,passion.com,🚀 节点选择
   - DOMAIN-SUFFIX,passiontimes.hk,🚀 节点选择
-  - DOMAIN-SUFFIX,passwords.google,🚀 节点选择
   - DOMAIN-SUFFIX,paste.ee,🚀 节点选择
   - DOMAIN-SUFFIX,pastebin.com,🚀 节点选择
   - DOMAIN-SUFFIX,pastie.org,🚀 节点选择
@@ -6651,6 +6781,8 @@ rules:
   - DOMAIN-SUFFIX,pen.io,🚀 节点选择
   - DOMAIN-SUFFIX,penchinese.com,🚀 节点选择
   - DOMAIN-SUFFIX,penchinese.net,🚀 节点选择
+  - DOMAIN-SUFFIX,pengyulong.com,🚀 节点选择
+  - DOMAIN-SUFFIX,penisbot.com,🚀 节点选择
   - DOMAIN-SUFFIX,pentalogic.net,🚀 节点选择
   - DOMAIN-SUFFIX,penthouse.com,🚀 节点选择
   - DOMAIN-SUFFIX,pentoy.hk,🚀 节点选择
@@ -6667,6 +6799,7 @@ rules:
   - DOMAIN-SUFFIX,phapluan.org,🚀 节点选择
   - DOMAIN-SUFFIX,phayul.com,🚀 节点选择
   - DOMAIN-SUFFIX,philborges.com,🚀 节点选择
+  - DOMAIN-SUFFIX,philly.com,🚀 节点选择
   - DOMAIN-SUFFIX,phmsociety.org,🚀 节点选择
   - DOMAIN-SUFFIX,phncdn.com,🚀 节点选择
   - DOMAIN-SUFFIX,phonegap.com,🚀 节点选择
@@ -6811,6 +6944,7 @@ rules:
   - DOMAIN-SUFFIX,provpnaccounts.com,🚀 节点选择
   - DOMAIN-SUFFIX,proxfree.com,🚀 节点选择
   - DOMAIN-SUFFIX,proxifier.com,🚀 节点选择
+  - DOMAIN-SUFFIX,proxlet.com,🚀 节点选择
   - DOMAIN-SUFFIX,proxomitron.info,🚀 节点选择
   - DOMAIN-SUFFIX,proxpn.com,🚀 节点选择
   - DOMAIN-SUFFIX,proxyanonimo.es,🚀 节点选择
@@ -6877,6 +7011,7 @@ rules:
   - DOMAIN-SUFFIX,qkshare.com,🚀 节点选择
   - DOMAIN-SUFFIX,qmzdd.com,🚀 节点选择
   - DOMAIN-SUFFIX,qoos.com,🚀 节点选择
+  - DOMAIN-SUFFIX,qooza.hk,🚀 节点选择
   - DOMAIN-SUFFIX,qpoe.com,🚀 节点选择
   - DOMAIN-SUFFIX,qq.co.za,🚀 节点选择
   - DOMAIN-SUFFIX,qstatus.com,🚀 节点选择
@@ -6918,11 +7053,13 @@ rules:
   - DOMAIN-SUFFIX,raizoji.or.jp,🚀 节点选择
   - DOMAIN-SUFFIX,ramcity.com.au,🚀 节点选择
   - DOMAIN-SUFFIX,rangwang.biz,🚀 节点选择
+  - DOMAIN-SUFFIX,rangzen.com,🚀 节点选择
   - DOMAIN-SUFFIX,rangzen.net,🚀 节点选择
   - DOMAIN-SUFFIX,rangzen.org,🚀 节点选择
   - DOMAIN-SUFFIX,ranxiang.com,🚀 节点选择
   - DOMAIN-SUFFIX,ranyunfei.com,🚀 节点选择
   - DOMAIN-SUFFIX,rapbull.net,🚀 节点选择
+  - DOMAIN-SUFFIX,rapidgator.net,🚀 节点选择
   - DOMAIN-SUFFIX,rapidmoviez.com,🚀 节点选择
   - DOMAIN-SUFFIX,rapidvpn.com,🚀 节点选择
   - DOMAIN-SUFFIX,rarbgprx.org,🚀 节点选择
@@ -7764,7 +7901,6 @@ rules:
   - DOMAIN-SUFFIX,ticket.com.tw,🚀 节点选择
   - DOMAIN-SUFFIX,tigervpn.com,🚀 节点选择
   - DOMAIN-SUFFIX,tiktok.com,🚀 节点选择
-  - DOMAIN-SUFFIX,tiktokv.com,🚀 节点选择
   - DOMAIN-SUFFIX,tiltbrush.com,🚀 节点选择
   - DOMAIN-SUFFIX,timdir.com,🚀 节点选择
   - DOMAIN-SUFFIX,time.com,🚀 节点选择
@@ -7824,7 +7960,6 @@ rules:
   - DOMAIN-SUFFIX,torrentproject.se,🚀 节点选择
   - DOMAIN-SUFFIX,torrenty.org,🚀 节点选择
   - DOMAIN-SUFFIX,torrentz.eu,🚀 节点选择
-  - DOMAIN-SUFFIX,tortoisesvn.net,🚀 节点选择
   - DOMAIN-SUFFIX,torvpn.com,🚀 节点选择
   - DOMAIN-SUFFIX,totalvpn.com,🚀 节点选择
   - DOMAIN-SUFFIX,toutiaoabc.com,🚀 节点选择
