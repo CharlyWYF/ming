@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex 竞技记分板</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            background: #0a0a0f;
+        }
+
+        /* 扫描线动画 */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 20, 60, 0.3), inset 0 0 30px rgba(220, 20, 60, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(220, 20, 60, 0.5), inset 0 0 50px rgba(220, 20, 60, 0.2); }
+        }
+
+        @keyframes hexagon-pulse {
+            0%, 100% { opacity: 0.03; }
+            50% { opacity: 0.06; }
+        }
+
+        /* 六边形网格背景 */
+        .hex-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23dc143c' fill-opacity='0.15'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: hexagon-pulse 4s ease-in-out infinite;
+        }
+
+        /* 扫描线效果 */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(180deg, transparent, rgba(220, 20, 60, 0.3), transparent);
+            animation: scanline 3s linear infinite;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 左侧数据栏 - Apex 风格 */
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(220, 20, 60, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, #dc143c, transparent);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(220, 20, 60, 0.2);
+            position: relative;
+        }
+
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #dc143c;
+        }
+
+        .sidebar-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: #dc143c;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sidebar-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(135deg, #ff1744 0%, #dc143c 100%);
+            box-shadow: 0 0 25px rgba(220, 20, 60, 0.5);
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.05);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 69, 58, 0.2);
+            color: #ff453a;
+            border-color: #ff453a;
+        }
+
+        .data-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .data-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .data-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .data-list::-webkit-scrollbar-thumb {
+            background: #dc143c;
+            border-radius: 2px;
+        }
+
+        .data-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .data-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: #dc143c;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .data-item:hover {
+            background: rgba(220, 20, 60, 0.1);
+            border-color: rgba(220, 20, 60, 0.3);
+        }
+
+        .data-item:hover::before {
+            opacity: 1;
+        }
+
+        .data-item.active {
+            background: rgba(220, 20, 60, 0.15);
+            border-color: #dc143c;
+        }
+
+        .data-item.active::before {
+            opacity: 1;
+        }
+
+        .data-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .data-item-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #fff;
+        }
+
+        .data-item-delete {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .data-item-delete:hover {
+            background: #ff453a;
+            color: white;
+        }
+
+        .data-item-scores {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .data-item-left-score {
+            color: #00d4ff;
+        }
+
+        .data-item-right-score {
+            color: #dc143c;
+        }
+
+        .data-item-names {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .data-item-colors {
+            display: flex;
+            gap: 6px;
+        }
+
+        .data-item-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 主记分板区域 */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0f;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: linear-gradient(180deg, #15151f 0%, #0a0a0f 100%);
+            border-bottom: 1px solid rgba(220, 20, 60, 0.2);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dc143c, transparent);
+        }
+
+        .header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            color: #fff;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .header h1::before {
+            content: '///';
+            color: #dc143c;
+            margin-right: 10px;
+        }
+
+        .header button {
+            padding: 10px 20px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            color: #aaa;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+
+        .header button:hover {
+            background: rgba(220, 20, 60, 0.2);
+            color: #dc143c;
+            border-color: #dc143c;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .scoreboard {
+            flex: 1;
+            display: flex;
+        }
+
+        .side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            position: relative;
+        }
+
+        .side.left {
+            border-right: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(220, 20, 60, 0.15);
+            pointer-events: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .side:hover::before {
+            border-color: rgba(220, 20, 60, 0.4);
+            box-shadow: inset 0 0 50px rgba(220, 20, 60, 0.1);
+        }
+
+        .team-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            cursor: pointer;
+            padding: 8px 24px;
+            border-radius: 4px;
+            border: 2px dashed transparent;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .team-name:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(220, 20, 60, 0.5);
+        }
+
+        .team-name:focus {
+            outline: none;
+            border-color: #dc143c;
+            background: rgba(220, 20, 60, 0.1);
+        }
+
+        .score {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 200px;
+            font-weight: 400;
+            line-height: 1;
+            text-shadow: 0 0 40px currentColor;
+            user-select: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            width: 72px;
+            height: 72px;
+            font-size: 36px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.92);
+        }
+
+        .btn-minus {
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .btn-minus:hover {
+            background: linear-gradient(135deg, #dc143c 0%, #ff1744 100%);
+            box-shadow: 0 4px 30px rgba(220, 20, 60, 0.6);
+        }
+
+        .btn-plus {
+            background: linear-gradient(135deg, #006666 0%, #00d4ff 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-plus:hover {
+            background: linear-gradient(135deg, #00d4ff 0%, #00ffff 100%);
+            box-shadow: 0 4px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        .color-picker-container {
+            position: absolute;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        .color-input {
+            width: 56px;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .color-input:hover {
+            border-color: #dc143c;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .color-input::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 2px;
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 24px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: rgba(220, 20, 60, 0.2);
+            color: #dc143c;
+            border-color: #dc143c;
+        }
+
+        .left .reset-btn {
+            left: 24px;
+        }
+
+        .right .reset-btn {
+            right: 24px;
+        }
+
+        /* 输入弹窗 - Apex 风格 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            background: linear-gradient(180deg, #1a1a24 0%, #12121a 100%);
+            padding: 32px;
+            border-radius: 4px;
+            width: 380px;
+            color: white;
+            box-shadow: 0 0 60px rgba(220, 20, 60, 0.3);
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            position: relative;
+        }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #dc143c, transparent);
+        }
+
+        .modal h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #dc143c;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            margin-bottom: 24px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: #dc143c;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .modal-btn-confirm:hover {
+            background: linear-gradient(135deg, #ff1744 0%, #dc143c 100%);
+            box-shadow: 0 0 25px rgba(220, 20, 60, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 六边形网格背景 -->
+    <div class="hex-grid"></div>
+    <!-- 扫描线效果 -->
+    <div class="scanline"></div>
+
+    <!-- 左侧数据栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Saved Records</h2>
+            <div class="sidebar-actions">
+                <button class="btn-save" onclick="showSaveModal()">+ Save</button>
+                <button class="btn-clear" onclick="clearAllData()">Clear All</button>
+            </div>
+        </div>
+        <div class="data-list" id="dataList">
+            <!-- 数据列表由JS生成 -->
+        </div>
+    </div>
+
+    <!-- 主记分板 -->
+    <div class="main">
+        <div class="header">
+            <h1>Apex Scoreboard</h1>
+            <div>
+                <button onclick="toggleFullscreen()">Fullscreen</button>
+                <button onclick="resetCurrentBoard()">Reset</button>
+            </div>
+        </div>
+
+        <div class="scoreboard">
+            <div class="side left" id="leftSide">
+                <button class="reset-btn" onclick="resetScore('left')">Reset</button>
+                <div class="team-name" contenteditable="true" oninput="markDirty()" id="leftName">Left Team</div>
+                <div class="score" id="leftScore">0</div>
+                <div class="controls">
+                    <button class="btn btn-minus" onclick="changeScore('left', -1)">−</button>
+                    <button class="btn btn-plus" onclick="changeScore('left', 1)">+</button>
+                </div>
+                <div class="color-picker-container">
+                    <span class="color-label">Panel Color</span>
+                    <input type="color" class="color-input" id="leftColorPicker" onchange="setColor('left', this.value)">
+                </div>
+            </div>
+
+            <div class="side right" id="rightSide">
+                <button class="reset-btn" onclick="resetScore('right')">Reset</button>
+                <div class="team-name" contenteditable="true" oninput="markDirty()" id="rightName">Right Team</div>
+                <div class="score" id="rightScore">0</div>
+                <div class="controls">
+                    <button class="btn btn-minus" onclick="changeScore('right', -1)">−</button>
+                    <button class="btn btn-plus" onclick="changeScore('right', 1)">+</button>
+                </div>
+                <div class="color-picker-container">
+                    <span class="color-label">Panel Color</span>
+                    <input type="color" class="color-input" id="rightColorPicker" onchange="setColor('right', this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存弹窗 -->
+    <div class="modal-overlay" id="saveModal">
+        <div class="modal">
+            <h3>Save Record</h3>
+            <input type="text" id="saveName" placeholder="Enter record name..." onkeydown="if(event.key==='Enter')saveToList()">
+            <div class="modal-buttons">
+                <button class="modal-btn-cancel" onclick="closeSaveModal()">Cancel</button>
+                <button class="modal-btn-confirm" onclick="saveToList()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WCAG 对比度工具函数
+        // 计算相对亮度 (WCAG 2.0)
+        function getRelativeLuminance(hexColor) {
+            // 移除 # 前缀
+            const color = hexColor.replace('#', '');
+
+            // 解析 RGB 值
+            const r = parseInt(color.substring(0, 2), 16) / 255;
+            const g = parseInt(color.substring(2, 4), 16) / 255;
+            const b = parseInt(color.substring(4, 6), 16) / 255;
+
+            // 转换为线性 RGB 值
+            const rLinear = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+            const gLinear = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+            const bLinear = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+
+            // 计算相对亮度
+            return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
+        }
+
+        // 计算对比度
+        function getContrastRatio(color1, color2) {
+            const l1 = getRelativeLuminance(color1);
+            const l2 = getRelativeLuminance(color2);
+
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        // 获取符合 WCAG 标准的可访问文字颜色
+        function getAccessibleTextColor(bgColor) {
+            const whiteContrast = getContrastRatio(bgColor, '#ffffff');
+            const blackContrast = getContrastRatio(bgColor, '#000000');
+
+            // WCAG AA 标准要求对比度至少 4.5:1
+            // 选择对比度更高的颜色
+            return whiteContrast >= blackContrast ? '#ffffff' : '#000000';
+        }
+
+        // 更新文字颜色以满足 WCAG 对比度要求
+        function updateTextColors(side) {
+            const sideEl = document.getElementById(side + 'Side');
+            const bgColor = sideEl.style.backgroundColor;
+
+            if (!bgColor) return;
+
+            // 将 rgb() 转换为 hex
+            let hexColor = bgColor;
+            if (bgColor.startsWith('rgb')) {
+                const match = bgColor.match(/\d+/g);
+                if (match && match.length >= 3) {
+                    const r = parseInt(match[0]).toString(16).padStart(2, '0');
+                    const g = parseInt(match[1]).toString(16).padStart(2, '0');
+                    const b = parseInt(match[2]).toString(16).padStart(2, '0');
+                    hexColor = '#' + r + g + b;
+                }
+            }
+
+            const textColor = getAccessibleTextColor(hexColor);
+
+            // 更新团队名称
+            const nameEl = document.getElementById(side + 'Name');
+            nameEl.style.color = textColor;
+
+            // 更新分数
+            const scoreEl = document.getElementById(side + 'Score');
+            scoreEl.style.color = textColor;
+
+            // 更新颜色标签
+            const colorLabel = sideEl.querySelector('.color-label');
+            if (colorLabel) {
+                colorLabel.style.color = textColor;
+                colorLabel.style.opacity = '0.6';
+            }
+        }
+
+        // 默认颜色
+        const defaultColors = {
+            left: '#00d4ff',
+            right: '#dc143c'
+        };
+
+        // 当前数据ID
+        let currentId = null;
+        // 是否有未保存的修改
+        let isDirty = false;
+
+        // 初始化
+        function init() {
+            loadDataList();
+            if (!currentId) {
+                setColor('left', defaultColors.left);
+                setColor('right', defaultColors.right);
+            }
+        }
+
+        // 标记有修改
+        function markDirty() {
+            isDirty = true;
+        }
+
+        // 加载数据列表
+        function loadDataList() {
+            const dataList = JSON.parse(localStorage.getItem('scoreboardList') || '[]');
+            const container = document.getElementById('dataList');
+            container.innerHTML = '';
+
+            if (dataList.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#555;padding:40px 20px;font-size:14px;">No saved records</div>';
+                return;
+            }
+
+            dataList.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'data-item' + (currentId === item.id ? ' active' : '');
+                div.onclick = (e) => {
+                    if (!e.target.classList.contains('data-item-delete')) {
+                        loadItem(item.id);
+                    }
+                };
+                div.innerHTML = `
+                    <div class="data-item-header">
+                        <span class="data-item-name">${item.name}</span>
+                        <button class="data-item-delete" onclick="deleteItem(${index})">×</button>
+                    </div>
+                    <div class="data-item-names">
+                        <span>${item.leftName}</span>
+                        <span>${item.rightName}</span>
+                    </div>
+                    <div class="data-item-scores">
+                        <span class="data-item-left-score">${item.leftScore}</span>
+                        <span class="data-item-right-score">${item.rightScore}</span>
+                    </div>
+                    <div class="data-item-colors">
+                        <div class="data-item-color" style="background:${item.leftColor}"></div>
+                        <div class="data-item-color" style="background:${item.rightColor}"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 加载指定项目
+        function loadItem(id) {
+            const dataList = JSON.parse(localStorage.getItem('scoreboardList') || '[]');
+            const item = dataList.find(i => i.id === id);
+            if (item) {
+                currentId = id;
+                isDirty = false;
+                document.getElementById('leftScore').textContent = item.leftScore;
+                document.getElementById('rightScore').textContent = item.rightScore;
+                document.getElementById('leftName').textContent = item.leftName;
+                document.getElementById('rightName').textContent = item.rightName;
+                setColor('left', item.leftColor);
+                setColor('right', item.rightColor);
+                loadDataList();
+            }
+        }
+
+        // 获取当前数据
+        function getCurrentData() {
+            return {
+                leftScore: parseInt(document.getElementById('leftScore').textContent),
+                rightScore: parseInt(document.getElementById('rightScore').textContent),
+                leftName: document.getElementById('leftName').textContent,
+                rightName: document.getElementById('rightName').textContent,
+                leftColor: document.getElementById('leftSide').style.backgroundColor || defaultColors.left,
+                rightColor: document.getElementById('rightSide').style.backgroundColor || defaultColors.right
+            };
+        }
+
+        // 保存当前数据到已存在的记录
+        function saveCurrentData() {
+            if (!currentId || !isDirty) return;
+            const dataList = JSON.parse(localStorage.getItem('scoreboardList') || '[]');
+            const index = dataList.findIndex(i => i.id === currentId);
+            if (index !== -1) {
+                dataList[index] = { ...dataList[index], ...getCurrentData() };
+                localStorage.setItem('scoreboardList', JSON.stringify(dataList));
+                isDirty = false;
+                loadDataList();
+            }
+        }
+
+        // 显示保存弹窗
+        function showSaveModal() {
+            document.getElementById('saveModal').style.display = 'flex';
+            document.getElementById('saveName').focus();
+        }
+
+        // 关闭保存弹窗
+        function closeSaveModal() {
+            document.getElementById('saveModal').style.display = 'none';
+            document.getElementById('saveName').value = '';
+        }
+
+        // 保存到列表
+        function saveToList() {
+            const name = document.getElementById('saveName').value.trim() || 'Unnamed';
+            const dataList = JSON.parse(localStorage.getItem('scoreboardList') || '[]');
+
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                ...getCurrentData()
+            };
+
+            dataList.push(newItem);
+            localStorage.setItem('scoreboardList', JSON.stringify(dataList));
+            currentId = newItem.id;
+            isDirty = false;
+
+            closeSaveModal();
+            loadDataList();
+        }
+
+        // 删除指定记录
+        function deleteItem(index) {
+            if (confirm('Delete this record?')) {
+                const dataList = JSON.parse(localStorage.getItem('scoreboardList') || '[]');
+                dataList.splice(index, 1);
+                localStorage.setItem('scoreboardList', JSON.stringify(dataList));
+
+                if (currentId && !dataList.find(i => i.id === currentId)) {
+                    currentId = null;
+                    isDirty = false;
+                }
+                loadDataList();
+            }
+        }
+
+        // 清空全部记录
+        function clearAllData() {
+            if (confirm('Clear all saved records? This cannot be undone!')) {
+                localStorage.removeItem('scoreboardList');
+                currentId = null;
+                isDirty = false;
+                resetCurrentBoard();
+                loadDataList();
+            }
+        }
+
+        // 改变分数
+        function changeScore(side, delta) {
+            const scoreEl = document.getElementById(side + 'Score');
+            let score = parseInt(scoreEl.textContent) + delta;
+            if (score < 0) score = 0;
+            scoreEl.textContent = score;
+            markDirty();
+            saveCurrentData();
+        }
+
+        // 设置颜色
+        function setColor(side, color) {
+            const sideEl = document.getElementById(side + 'Side');
+            sideEl.style.backgroundColor = color;
+            document.getElementById(side + 'ColorPicker').value = color;
+
+            // 更新文字颜色以满足 WCAG 对比度要求
+            updateTextColors(side);
+
+            markDirty();
+            saveCurrentData();
+        }
+
+        // 重置单方分数
+        function resetScore(side) {
+            document.getElementById(side + 'Score').textContent = 0;
+            markDirty();
+            saveCurrentData();
+        }
+
+        // 重置当前记分板（不影响保存的记录）
+        function resetCurrentBoard() {
+            document.getElementById('leftScore').textContent = 0;
+            document.getElementById('rightScore').textContent = 0;
+            document.getElementById('leftName').textContent = 'Left Team';
+            document.getElementById('rightName').textContent = 'Right Team';
+            setColor('left', defaultColors.left);
+            setColor('right', defaultColors.right);
+            isDirty = true;
+            saveCurrentData();
+        }
+
+        // 全屏切换
+        function toggleFullscreen() {
+            if (!document.documentElement.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        // 队名失焦时保存
+        document.getElementById('leftName').addEventListener('blur', saveCurrentData);
+        document.getElementById('rightName').addEventListener('blur', saveCurrentData);
+
+        // 页面加载完成后初始化
+        window.onload = init;
+    </script>
+</body>
+</html>
