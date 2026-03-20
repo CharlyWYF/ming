@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .title-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .apex-header {
+            width: 200px;
+            height: 80px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/7/73/Apex_legends_logo.svg') center/contain no-repeat;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.8));
+        }
+        .title {
+            color: white;
+            font-size: 3.5vw;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5),
+                         0 0 20px rgba(255, 69, 0, 0.8);
+            background: linear-gradient(45deg, #ff4d4d, #ff8533);
+            padding: 20px 40px;
+            border-radius: 10px;
+            transform: rotate(-5deg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+            border: 3px solid #fff;
+            position: relative;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            color: #fff;
+            font-size: 1.5vw;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 69, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            transform: rotate(-2deg);
+            animation: pulse 2s infinite;
+        }
+        .title::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 50px;
+            height: 50px;
+            background: url('https://www.ea.com/games/apex-legends/images/apex-legends-red-logo.svg') center/contain no-repeat;
+            animation: spin 10s linear infinite;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .close-btn::before,
+        .close-btn::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            transform: rotate(45deg);
+        }
+        .close-btn::after {
+            transform: rotate(-45deg);
+        }
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        .apex-logo {
+            position: absolute;
+            bottom: 30px;
+            width: 150px;
+            height: 150px;
+            background: url('https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/apex-featured-image-16x9.jpg.adapt.crop16x9.1023w.jpg') center/cover;
+            border-radius: 50%;
+            border: 3px solid #ff4d4d;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: rotate(-5deg) translateY(0px); }
+            50% { transform: rotate(-5deg) translateY(-20px); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .rookie-badge {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: url('https://i0.wp.com/www.alphr.com/wp-content/uploads/2022/02/BR_Unranked.png?resize=300%2C300&ssl=1') center/contain no-repeat;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+            opacity: 0.6;
+            z-index: -1;
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.3);
+                filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.8));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay" onclick="closeOverlay(event)">
+        <button class="close-btn" onclick="closeOverlay(event)"></button>
+        <div class="title-container" onclick="event.stopPropagation()">
+            <div class="apex-header"></div>
+            <div class="title">APEX 蛋疼级大主播 ⌈小铭还行⌋</div>
+            <div class="rookie-badge"></div>
+            <div class="subtitle">每天带你冲上菜鸟 | 24小时不在直播</div>
+        </div>
+        <div class="apex-logo" onclick="event.stopPropagation()"></div>
+    </div>
+    <script>
+        function closeOverlay(event) {
+            if (event.target.id === 'overlay' || event.target.classList.contains('close-btn')) {
+                document.getElementById('overlay').classList.add('hidden');
+            }
+        }
+    </script>
+    <iframe 
+        src="https://www.bilibili.com/blackboard/live/live-activity-player.html?cid=9918502&quality=0"
+        frameborder="no"
+        framespacing="0"
+        scrolling="no"
+        allow="autoplay; encrypted-media"
+        allowfullscreen="true">
+    </iframe>
+</body>
+</html>
