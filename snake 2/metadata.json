@@ -1,0 +1,6 @@
+{
+  "name": "Snake Go AI",
+  "description": "A modern Snake game with autopilot mode, manual override, and local leaderboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

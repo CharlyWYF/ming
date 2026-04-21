@@ -1,0 +1,456 @@
+/* 贪吃蛇游戏 - 样式文件 */
+
+/* CSS 变量 */
+:root {
+    --bg-color: #f5f5dc;
+    --bg-secondary: #f0f0e0;
+    --text-color: #333;
+    --text-light: #666;
+    --primary: #3cb371;
+    --primary-dark: #2e8b57;
+    --accent: #ff6b6b;
+    --accent-hover: #ff5252;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-strong: rgba(0, 0, 0, 0.2);
+    --border-radius: 12px;
+    --border-radius-sm: 8px;
+    --transition: 0.3s ease;
+}
+
+/* 基础重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* 游戏容器 */
+.game-container {
+    display: flex;
+    gap: 20px;
+    max-width: 900px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 游戏区域 */
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Canvas 容器 */
+.canvas-wrapper {
+    position: relative;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px var(--shadow-strong);
+    overflow: hidden;
+    background: #fff;
+}
+
+#game-canvas {
+    display: block;
+    background: #f5f5dc;
+}
+
+/* 触控按钮区域 */
+.touch-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(2, 60px);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.touch-btn {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    box-shadow: 0 4px 8px var(--shadow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--primary-dark);
+    transition: var(--transition);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.touch-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.touch-btn:hover {
+    background: linear-gradient(145deg, #f0f0f0, #d9d9d9);
+}
+
+.touch-btn.empty {
+    visibility: hidden;
+}
+
+/* 方向按钮位置 */
+.btn-up { grid-column: 2; grid-row: 1; }
+.btn-left { grid-column: 1; grid-row: 2; }
+.btn-down { grid-column: 2; grid-row: 2; }
+.btn-right { grid-column: 3; grid-row: 2; }
+
+/* 侧边栏 */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 200px;
+    max-width: 280px;
+    width: 100%;
+}
+
+/* 面板 */
+.panel {
+    background: #fff;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: 0 4px 15px var(--shadow);
+}
+
+.panel-title {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 分数显示 */
+.score-display {
+    text-align: center;
+}
+
+.score-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+
+.score-label {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+/* 控制按钮 */
+.control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.game-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.game-btn.primary {
+    background: var(--primary);
+    color: white;
+}
+
+.game-btn.primary:hover {
+    background: var(--primary-dark);
+}
+
+.game-btn.secondary {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+}
+
+.game-btn.secondary:hover {
+    background: #e0e0d0;
+}
+
+.game-btn.auto-mode {
+    background: #fff;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.game-btn.auto-mode.active {
+    background: var(--primary);
+    color: white;
+}
+
+.game-btn.auto-mode:hover {
+    background: rgba(60, 179, 113, 0.1);
+}
+
+/* 控制状态指示器 */
+.control-indicator {
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--bg-secondary);
+}
+
+.control-indicator.auto {
+    background: rgba(60, 179, 113, 0.15);
+    color: var(--primary-dark);
+}
+
+.control-indicator.manual {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--accent);
+}
+
+/* 积分榜 */
+.leaderboard {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.leaderboard-list {
+    list-style: none;
+}
+
+.leaderboard-list li {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--bg-secondary);
+    font-size: 13px;
+    transition: var(--transition);
+}
+
+.leaderboard-list li:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-list li.new-record {
+    background: rgba(60, 179, 113, 0.15);
+    animation: highlight 2s ease;
+}
+
+@keyframes highlight {
+    0%, 100% { background: transparent; }
+    50% { background: rgba(60, 179, 113, 0.3); }
+}
+
+.leaderboard-list .rank {
+    width: 35px;
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+
+.leaderboard-list .score {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.leaderboard-list .mode {
+    width: 30px;
+    text-align: center;
+}
+
+.leaderboard-list .date {
+    color: var(--text-light);
+    font-size: 11px;
+}
+
+.leaderboard-list li.empty {
+    color: var(--text-light);
+    justify-content: center;
+    padding: 20px;
+}
+
+/* 覆盖层 */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.overlay-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.overlay-text {
+    font-size: 16px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.overlay .game-btn {
+    min-width: 120px;
+}
+
+/* 开始屏幕 */
+#start-screen {
+    background: rgba(60, 179, 113, 0.95);
+}
+
+#start-screen .overlay-title {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+#start-screen .overlay-text {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+/* 结束屏幕 */
+#gameover-screen {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+/* 暂停覆盖层 */
+#pause-overlay {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game-area {
+        order: 1;
+    }
+
+    .sidebar {
+        order: 2;
+        max-width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .panel {
+        flex: 1;
+        min-width: 150px;
+        max-width: 200px;
+    }
+
+    /* 移动端触控按钮更大 */
+    .touch-controls {
+        grid-template-columns: repeat(3, 70px);
+        grid-template-rows: repeat(2, 70px);
+        gap: 10px;
+    }
+
+    .touch-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        flex-direction: column;
+    }
+
+    .panel {
+        max-width: 100%;
+    }
+
+    .touch-controls {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(2, 60px);
+    }
+
+    .touch-btn {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* 横屏模式 */
+@media (orientation: landscape) and (max-height: 600px) {
+    .game-container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .game-area {
+        flex: 0 0 auto;
+    }
+
+    .sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .panel {
+        min-width: 120px;
+    }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}

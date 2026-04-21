@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇·智慧核心 - 离线版</title>
+    <!-- 加载 Tailwind 4 浏览器版 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- 加载 Lucide 图标 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        :root {
+            --slate-text: #2D3748;
+            --slate-muted: #A0AEC0;
+            --emerald-active: #48BB78;
+        }
+
+        body {
+            background-color: #F4F7F2;
+            color: var(--slate-text);
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 99px; }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .tactile-btn {
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        }
+        .tactile-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
+        
+        <!-- 左侧：游戏区域 -->
+        <div class="bg-white rounded-[24px] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.05)] border-[8px] border-[#E2E8F0] relative overflow-hidden flex flex-col h-fit">
+            <!-- HUD 头部 -->
+            <div class="flex flex-wrap items-center justify-between gap-4 p-4 bg-white/80 backdrop-blur-sm border-b border-gray-100 z-10">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-black text-emerald-600 tracking-tight">贪吃蛇·智慧核心</h1>
+                    <div id="status-pill" class="hidden px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 bg-[#C6F6D5] text-[#22543D]">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#22543D] animate-pulse"></span>
+                        自动驾驶中
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="btn-pause" class="w-28 py-2 bg-gray-100 text-gray-600 font-bold rounded-lg text-sm hover:bg-gray-200 tactile-btn">开始</button>
+                    <button id="btn-restart" class="w-28 py-2 bg-emerald-500 text-white font-bold rounded-lg text-sm hover:bg-emerald-600 tactile-btn">重新开始</button>
+                    <button id="btn-mode" class="w-40 py-2 bg-gray-100 text-gray-600 font-bold rounded-lg text-sm hover:bg-gray-200 tactile-btn">智慧核心: 关闭</button>
+                </div>
+            </div>
+
+            <!-- 画布区域 -->
+            <div class="p-4 flex-grow flex items-center justify-center bg-white relative">
+                <div class="absolute inset-0 pointer-events-none opacity-[0.03]" 
+                     style="background-image: linear-gradient(to right, #2D3748 1px, transparent 1px), linear-gradient(to bottom, #2D3748 1px, transparent 1px); background-size: 25px 25px;">
+                </div>
+                <div class="relative w-full max-w-[500px] aspect-square rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white">
+                    <canvas id="gameCanvas" width="500" height="500"></canvas>
+                    <div id="game-over-overlay" class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center">
+                        <h2 class="text-4xl font-black text-white mb-2">哎呀!</h2>
+                        <p class="text-white/70 mb-8 font-medium">小蛇撞到了墙壁或它自己...</p>
+                        <button id="btn-retry" class="px-8 py-3 bg-white text-slate-900 font-black rounded-2xl shadow-xl uppercase tracking-widest text-sm">再试一次</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：侧边栏 -->
+        <div class="flex flex-col gap-5">
+            <!-- 得分面板 -->
+            <div class="bg-white p-5 rounded-[24px] border border-gray-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="flex justify-between items-start divide-x divide-gray-100">
+                    <div class="w-1/2 pr-4">
+                        <div class="text-[12px] font-bold uppercase tracking-wider text-slate-muted mb-1">当前得分</div>
+                        <div id="current-score" class="text-3xl font-extrabold text-slate-text tracking-tight">0</div>
+                    </div>
+                    <div class="w-1/2 pl-4">
+                        <div class="text-[12px] font-bold uppercase tracking-wider text-slate-muted mb-1">最高纪录</div>
+                        <div id="best-score" class="text-3xl font-extrabold text-emerald-active tracking-tight">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 排行榜 -->
+            <div class="bg-white p-6 rounded-[24px] border border-gray-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="text-[12px] font-bold uppercase tracking-wider text-slate-muted mb-4 flex items-center gap-2">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    本地积分榜
+                </div>
+                <div id="leaderboard" class="space-y-1 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar text-sm font-bold">
+                    <!-- 动态注入 -->
+                </div>
+            </div>
+
+            <!-- 控制盘 -->
+            <div class="mt-auto flex flex-col items-center">
+                <div class="grid grid-cols-3 gap-3">
+                    <div></div>
+                    <button id="ctrl-up" class="w-16 h-16 flex items-center justify-center rounded-2xl bg-[#EDF2F7] text-slate-text border-b-4 border-[#CBD5E0] shadow-md tactile-btn"><i data-lucide="chevron-up" stroke-width="3"></i></button>
+                    <div></div>
+                    <button id="ctrl-left" class="w-16 h-16 flex items-center justify-center rounded-2xl bg-[#EDF2F7] text-slate-text border-b-4 border-[#CBD5E0] shadow-md tactile-btn"><i data-lucide="chevron-left" stroke-width="3"></i></button>
+                    <div></div>
+                    <button id="ctrl-right" class="w-16 h-16 flex items-center justify-center rounded-2xl bg-emerald-500 text-white border-b-4 border-emerald-700 shadow-lg tactile-btn"><i data-lucide="chevron-right" stroke-width="3"></i></button>
+                    <div></div>
+                    <button id="ctrl-down" class="w-16 h-16 flex items-center justify-center rounded-2xl bg-[#EDF2F7] text-slate-text border-b-4 border-[#CBD5E0] shadow-md tactile-btn"><i data-lucide="chevron-down" stroke-width="3"></i></button>
+                    <div></div>
+                </div>
+                <div class="mt-4 text-[11px] text-slate-muted font-bold uppercase tracking-widest text-center hidden md:block">
+                    控制：WASD / 方向键 • 空格：暂停
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 常量配置 ---
+        const GRID_SIZE = 20;
+        const CELL_SIZE = 500 / GRID_SIZE;
+        const STORAGE_KEY = 'snake-go-ai-standalone';
+        const OVERRIDE_DURATION = 200; // 0.2s
+
+        // --- 游戏状态 ---
+        let snake = [{x: 10, y: 10}, {x: 10, y: 11}, {x: 10, y: 12}];
+        let food = {x: 5, y: 5};
+        let direction = 'UP';
+        let nextDirection = 'UP';
+        let status = 'IDLE'; // IDLE, RUNNING, PAUSED, GAMEOVER
+        let controlMode = 'MANUAL'; // MANUAL, AUTO
+        let score = 0;
+        let speed = 150;
+        let overrideTime = 0;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- 初始化 Lucide ---
+        lucide.createIcons();
+
+        // --- 核心逻辑 ---
+
+        function init() {
+            loadStorage();
+            reset();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function reset() {
+            snake = [{x: 10, y: 10}, {x: 10, y: 11}, {x: 10, y: 12}];
+            direction = 'UP';
+            nextDirection = 'UP';
+            score = 0;
+            status = 'IDLE';
+            speed = 150;
+            updateUI();
+            spawnFood();
+        }
+
+        function spawnFood() {
+            while (true) {
+                food = {
+                    x: Math.floor(Math.random() * GRID_SIZE),
+                    y: Math.floor(Math.random() * GRID_SIZE)
+                };
+                if (!snake.some(s => s.x === food.x && s.y === food.y)) break;
+            }
+        }
+
+        let lastTime = 0;
+        function gameLoop(timestamp) {
+            const delta = timestamp - lastTime;
+            if (delta > speed && status === 'RUNNING') {
+                update();
+                lastTime = timestamp;
+            }
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            const now = Date.now();
+            let currentDir = nextDirection;
+
+            // 智慧核心逻辑 (Autopilot)
+            if (controlMode === 'AUTO') {
+                if (now < overrideTime) {
+                    // 人工干预中，使用 nextDirection
+                } else {
+                    currentDir = calculateAIDirection();
+                }
+            }
+            direction = currentDir;
+
+            const head = Object.assign({}, snake[0]);
+            if (direction === 'UP') head.y--;
+            if (direction === 'DOWN') head.y++;
+            if (direction === 'LEFT') head.x--;
+            if (direction === 'RIGHT') head.x++;
+
+            // 碰撞检测
+            if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE ||
+                snake.some(s => s.x === head.x && s.y === head.y)) {
+                gameOver();
+                return;
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                speed = Math.max(60, speed - 2);
+                spawnFood();
+                updateUI();
+            } else {
+                snake.pop();
+            }
+        }
+
+        function calculateAIDirection() {
+            const head = snake[0];
+            const dirs = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+            const scores = dirs.map(d => {
+                const h = { x: head.x, y: head.y };
+                if (d === 'UP') h.y--;
+                if (d === 'DOWN') h.y++;
+                if (d === 'LEFT') h.x--;
+                if (d === 'RIGHT') h.x++;
+                
+                // 排除死亡路径
+                const isDead = h.x < 0 || h.x >= GRID_SIZE || h.y < 0 || h.y >= GRID_SIZE ||
+                               snake.slice(0, -1).some(s => s.x === h.x && s.y === h.y);
+                if (isDead) return Infinity;
+
+                // 曼哈顿距离
+                return Math.abs(h.x - food.x) + Math.abs(h.y - food.y);
+            });
+
+            let bestDir = direction;
+            let minScore = Infinity;
+            scores.forEach((s, i) => {
+                // 禁止直接掉头
+                const isOpposite = (dirs[i] === 'UP' && direction === 'DOWN') ||
+                                   (dirs[i] === 'DOWN' && direction === 'UP') ||
+                                   (dirs[i] === 'LEFT' && direction === 'RIGHT') ||
+                                   (dirs[i] === 'RIGHT' && direction === 'LEFT');
+                
+                if (s < minScore && !isOpposite) {
+                    minScore = s;
+                    bestDir = dirs[i];
+                }
+            });
+            return bestDir;
+        }
+
+        function draw() {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, 500, 500);
+
+            // 画格网
+            ctx.strokeStyle = '#EDF2F7';
+            ctx.lineWidth = 1;
+            for(let i=0; i<=GRID_SIZE; i++) {
+                ctx.beginPath(); ctx.moveTo(i*CELL_SIZE, 0); ctx.lineTo(i*CELL_SIZE, 500); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i*CELL_SIZE); ctx.lineTo(500, i*CELL_SIZE); ctx.stroke();
+            }
+
+            // 画食物
+            ctx.fillStyle = '#F56565';
+            ctx.strokeStyle = '#C53030';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(food.x*CELL_SIZE + CELL_SIZE/2, food.y*CELL_SIZE + CELL_SIZE/2, CELL_SIZE/2.8, 0, Math.PI*2);
+            ctx.fill(); ctx.stroke();
+
+            // 画蛇
+            snake.forEach((s, index) => {
+                const isHead = index === 0;
+                ctx.fillStyle = isHead ? '#2F855A' : '#48BB78';
+                ctx.strokeStyle = '#2F855A';
+                ctx.lineWidth = 2;
+                const pad = 2;
+                const r = 6;
+                const x = s.x * CELL_SIZE + pad;
+                const y = s.y * CELL_SIZE + pad;
+                const w = CELL_SIZE - pad*2;
+                
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, w, r);
+                ctx.fill(); ctx.stroke();
+
+                if (isHead) {
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(x + w*0.75, y + w*0.25, 2, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        // --- 交互系统 ---
+
+        function updateUI() {
+            document.getElementById('current-score').innerText = score;
+            document.getElementById('best-score').innerText = localStorage.getItem('bestScore') || 0;
+            document.getElementById('status-pill').classList.toggle('hidden', controlMode !== 'AUTO' || status !== 'RUNNING');
+            document.getElementById('btn-pause').innerText = status === 'RUNNING' ? '暂停' : '开始';
+            document.getElementById('btn-mode').innerText = controlMode === 'AUTO' ? '智慧核心: 开启' : '智慧核心: 关闭';
+            document.getElementById('btn-mode').classList.toggle('bg-blue-500', controlMode === 'AUTO');
+            document.getElementById('btn-mode').classList.toggle('text-white', controlMode === 'AUTO');
+            document.getElementById('game-over-overlay').classList.toggle('hidden', status !== 'GAMEOVER');
+            renderLeaderboard();
+        }
+
+        function gameOver() {
+            status = 'GAMEOVER';
+            saveScore();
+            updateUI();
+        }
+
+        function saveScore() {
+            const best = parseInt(localStorage.getItem('bestScore') || 0);
+            if (score > best) localStorage.setItem('bestScore', score);
+
+            const record = { score, date: new Date().toISOString(), mode: controlMode };
+            let ledger = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+            ledger.push(record);
+            ledger.sort((a,b) => b.score - a.score);
+            localStorage.setItem('leaderboard', JSON.stringify(ledger.slice(0, 5)));
+        }
+
+        function loadStorage() {
+            updateUI();
+        }
+
+        function renderLeaderboard() {
+            const list = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+            const container = document.getElementById('leaderboard');
+            container.innerHTML = list.length ? '' : '<div class="text-center py-8 text-slate-muted text-sm italic font-medium">暂无记录</div>';
+            list.forEach((item, i) => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 grow">
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 text-gray-300">#${i+1}</span>
+                            <span>玩家_${i+1}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span>${item.score}</span>
+                            ${item.mode === 'AUTO' ? '<span class="text-[9px] bg-blue-50 text-blue-500 px-1 py-0.5 rounded">智慧</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function handleInput(dir) {
+            const opposites = { 'UP': 'DOWN', 'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT' };
+            if (dir === opposites[direction]) return;
+            
+            nextDirection = dir;
+            if (controlMode === 'AUTO') overrideTime = Date.now() + OVERRIDE_DURATION;
+        }
+
+        // --- 事件监听 ---
+
+        window.addEventListener('keydown', e => {
+            const keys = { 'ArrowUp': 'UP', 'w': 'UP', 'ArrowDown': 'DOWN', 's': 'DOWN', 'ArrowLeft': 'LEFT', 'a': 'LEFT', 'ArrowRight': 'RIGHT', 'd': 'RIGHT' };
+            if (keys[e.key]) handleInput(keys[e.key]);
+            if (e.key === ' ') { e.preventDefault(); togglePause(); }
+        });
+
+        function togglePause() {
+            if (status === 'GAMEOVER') return;
+            status = status === 'RUNNING' ? 'PAUSED' : 'RUNNING';
+            updateUI();
+        }
+
+        document.getElementById('btn-pause').onclick = togglePause;
+        document.getElementById('btn-restart').onclick = reset;
+        document.getElementById('btn-retry').onclick = reset;
+        document.getElementById('btn-mode').onclick = () => {
+            controlMode = controlMode === 'AUTO' ? 'MANUAL' : 'AUTO';
+            updateUI();
+        };
+
+        // D-PAD
+        document.getElementById('ctrl-up').onclick = () => handleInput('UP');
+        document.getElementById('ctrl-down').onclick = () => handleInput('DOWN');
+        document.getElementById('ctrl-left').onclick = () => handleInput('LEFT');
+        document.getElementById('ctrl-right').onclick = () => handleInput('RIGHT');
+
+        init();
+    </script>
+</body>
+</html>

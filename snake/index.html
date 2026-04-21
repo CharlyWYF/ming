@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>贪吃蛇游戏</title>
+    <style>
+        /* 贪吃蛇游戏 - 样式文件 */
+        :root {
+            --bg-color: #f5f5dc;
+            --bg-secondary: #f0f0e0;
+            --text-color: #333;
+            --text-light: #666;
+            --primary: #3cb371;
+            --primary-dark: #2e8b57;
+            --accent: #ff6b6b;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-strong: rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px var(--shadow-strong);
+            overflow: hidden;
+            background: #fff;
+        }
+
+        #game-canvas {
+            display: block;
+            background: #f5f5dc;
+        }
+
+        .touch-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(2, 60px);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .touch-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: 0 4px 8px var(--shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary-dark);
+            transition: var(--transition);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .touch-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .touch-btn:hover {
+            background: linear-gradient(145deg, #f0f0f0, #d9d9d9);
+        }
+
+        .btn-up { grid-column: 2; grid-row: 1; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 200px;
+            max-width: 280px;
+            width: 100%;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .panel-title {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-display {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .game-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .game-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .game-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .game-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-color);
+        }
+
+        .game-btn.secondary:hover {
+            background: #e0e0d0;
+        }
+
+        .game-btn.auto-mode {
+            background: #fff;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .game-btn.auto-mode.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .control-indicator {
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--bg-secondary);
+        }
+
+        .control-indicator.auto {
+            background: rgba(60, 179, 113, 0.15);
+            color: var(--primary-dark);
+        }
+
+        .control-indicator.manual {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--accent);
+        }
+
+        .leaderboard {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-list li {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--bg-secondary);
+            font-size: 13px;
+        }
+
+        .leaderboard-list li:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-list li.new-record {
+            background: rgba(60, 179, 113, 0.15);
+        }
+
+        .leaderboard-list .rank {
+            width: 35px;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .leaderboard-list .score {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .leaderboard-list .mode {
+            width: 30px;
+            text-align: center;
+        }
+
+        .leaderboard-list .date {
+            color: var(--text-light);
+            font-size: 11px;
+        }
+
+        .leaderboard-list li.empty {
+            color: var(--text-light);
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .overlay-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .overlay-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        #start-screen {
+            background: rgba(60, 179, 113, 0.95);
+        }
+
+        #start-screen .overlay-title {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        #start-screen .overlay-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        #gameover-screen {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        #pause-overlay {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .game-area {
+                order: 1;
+            }
+
+            .sidebar {
+                order: 2;
+                max-width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .panel {
+                flex: 1;
+                min-width: 150px;
+                max-width: 200px;
+            }
+
+            .touch-controls {
+                grid-template-columns: repeat(3, 70px);
+                grid-template-rows: repeat(2, 70px);
+                gap: 10px;
+            }
+
+            .touch-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                flex-direction: column;
+            }
+
+            .panel {
+                max-width: 100%;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-area">
+            <div class="canvas-wrapper">
+                <canvas id="game-canvas"></canvas>
+
+                <div id="start-screen" class="overlay">
+                    <div class="overlay-title">🐍 贪吃蛇</div>
+                    <div class="overlay-text">
+                        按空格或点击开始<br>
+                        <small>方向键 / 触控按钮控制</small>
+                    </div>
+                    <button id="btn-start" class="game-btn primary">开始游戏</button>
+                </div>
+
+                <div id="gameover-screen" class="overlay">
+                    <div class="overlay-title">游戏结束</div>
+                    <div class="overlay-text">
+                        最终得分: <span id="final-score">0</span>
+                    </div>
+                    <button id="btn-restart" class="game-btn primary">再来一局</button>
+                </div>
+
+                <div id="pause-overlay" class="overlay">
+                    <div class="overlay-title">已暂停</div>
+                    <div class="overlay-text">按空格继续</div>
+                    <button id="btn-resume" class="game-btn primary">继续游戏</button>
+                </div>
+            </div>
+
+            <div class="touch-controls">
+                <button id="btn-up" class="touch-btn btn-up">⬆️</button>
+                <button id="btn-left" class="touch-btn btn-left">⬅️</button>
+                <button id="btn-down" class="touch-btn btn-down">⬇️</button>
+                <button id="btn-right" class="touch-btn btn-right">➡️</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel">
+                <div class="score-display">
+                    <div class="panel-title">当前分数</div>
+                    <div id="current-score" class="score-value">0</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="score-display">
+                    <div class="panel-title">最高分</div>
+                    <div id="best-score" class="score-value">0</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">操作</div>
+                <div class="control-buttons">
+                    <button id="btn-pause" class="game-btn secondary">⏸️ 暂停</button>
+                    <button id="btn-toggle-auto" class="game-btn auto-mode">🤖 开启自动</button>
+                </div>
+                <div id="control-indicator" class="control-indicator" style="margin-top: 10px;">
+                    👤 手动控制
+                </div>
+            </div>
+
+            <div class="panel leaderboard">
+                <div class="panel-title">🏆 积分榜</div>
+                <ul id="leaderboard" class="leaderboard-list">
+                    <li class="empty">暂无记录</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 配置 ==========
+        const CONFIG = {
+            GRID_SIZE: 20,
+            GRID_COUNT_X: 20,
+            GRID_COUNT_Y: 15,
+            INITIAL_SPEED: 150,
+            MIN_SPEED: 50,
+            SPEED_DECREASE: 5,
+            FOOD_SCORE: 10,
+            MANUAL_OVERRIDE_DURATION: 1000,
+            STORAGE_KEYS: {
+                BEST_SCORE: 'snake_best_score',
+                LEADERBOARD: 'snake_leaderboard'
+            },
+            LEADERBOARD_SIZE: 10
+        };
+
+        // ========== 状态常量 ==========
+        const GameStatus = {
+            IDLE: 'idle',
+            RUNNING: 'running',
+            PAUSED: 'paused',
+            GAMEOVER: 'gameover'
+        };
+
+        const ControlMode = {
+            MANUAL: 'manual',
+            AUTO: 'auto'
+        };
+
+        const ControlOwner = {
+            MANUAL: 'manual',
+            AUTO: 'auto',
+            AUTO_WITH_MANUAL_OVERRIDE: 'auto_with_manual_override'
+        };
+
+        // ========== 渲染器 ==========
+        class Renderer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = CONFIG.GRID_SIZE * CONFIG.GRID_COUNT_X;
+                this.canvas.height = CONFIG.GRID_SIZE * CONFIG.GRID_COUNT_Y;
+
+                this.colors = {
+                    background: '#f5f5dc',
+                    grid: '#e8e8d0',
+                    snakeHead: '#2e8b57',
+                    snakeBody: '#3cb371',
+                    snakeBodyAlt: '#32cd32',
+                    food: '#ff6b6b'
+                };
+            }
+
+            clear() {
+                this.ctx.fillStyle = this.colors.background;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                this.drawGrid();
+            }
+
+            drawGrid() {
+                this.ctx.strokeStyle = this.colors.grid;
+                this.ctx.lineWidth = 0.5;
+
+                for (let x = 0; x <= CONFIG.GRID_COUNT_X; x++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x * CONFIG.GRID_SIZE, 0);
+                    this.ctx.lineTo(x * CONFIG.GRID_SIZE, this.canvas.height);
+                    this.ctx.stroke();
+                }
+
+                for (let y = 0; y <= CONFIG.GRID_COUNT_Y; y++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y * CONFIG.GRID_SIZE);
+                    this.ctx.lineTo(this.canvas.width, y * CONFIG.GRID_SIZE);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawSnake(snake) {
+                if (!snake || snake.length === 0) return;
+
+                snake.forEach((segment, index) => {
+                    const x = segment.x * CONFIG.GRID_SIZE;
+                    const y = segment.y * CONFIG.GRID_SIZE;
+                    const size = CONFIG.GRID_SIZE - 2;
+
+                    if (index === 0) {
+                        this.ctx.fillStyle = this.colors.snakeHead;
+                    } else {
+                        this.ctx.fillStyle = index % 2 === 0 ? this.colors.snakeBody : this.colors.snakeBodyAlt;
+                    }
+
+                    this.ctx.fillRect(x + 1, y + 1, size, size);
+                });
+            }
+
+            drawFood(food) {
+                if (!food) return;
+
+                const x = food.x * CONFIG.GRID_SIZE;
+                const y = food.y * CONFIG.GRID_SIZE;
+                const size = CONFIG.GRID_SIZE - 4;
+                const centerX = x + CONFIG.GRID_SIZE / 2;
+                const centerY = y + CONFIG.GRID_SIZE / 2;
+
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
+                this.ctx.fillStyle = this.colors.food;
+                this.ctx.fill();
+
+                this.ctx.beginPath();
+                this.ctx.arc(centerX - 2, centerY - 2, size / 6, 0, Math.PI * 2);
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                this.ctx.fill();
+            }
+
+            render(state) {
+                this.clear();
+                this.drawFood(state.food);
+                this.drawSnake(state.snake);
+            }
+        }
+
+        // ========== 食物系统 ==========
+        class Food {
+            generate(snake) {
+                let newPosition;
+                let attempts = 0;
+                const maxAttempts = 100;
+
+                do {
+                    newPosition = {
+                        x: Math.floor(Math.random() * CONFIG.GRID_COUNT_X),
+                        y: Math.floor(Math.random() * CONFIG.GRID_COUNT_Y)
+                    };
+                    attempts++;
+                } while (this.isOnSnake(newPosition, snake) && attempts < maxAttempts);
+
+                if (attempts >= maxAttempts) {
+                    this.position = null;
+                    return null;
+                }
+
+                this.position = newPosition;
+                return newPosition;
+            }
+
+            isOnSnake(position, snake) {
+                if (!snake) return false;
+                return snake.some(segment => segment.x === position.x && segment.y === position.y);
+            }
+
+            getPosition() {
+                return this.position;
+            }
+
+            reset() {
+                this.position = null;
+            }
+        }
+
+        // ========== 自动接管系统 ==========
+        class Autopilot {
+            constructor() {
+                this.directions = ['up', 'down', 'left', 'right'];
+            }
+
+            getSmartAutoDirection(state) {
+                const snake = state.snake;
+                const food = state.food;
+
+                if (!snake || snake.length === 0 || !food) {
+                    return state.direction;
+                }
+
+                const head = snake[0];
+                const currentDir = state.direction;
+
+                const safeDirections = this.getSafeDirections(state);
+
+                if (safeDirections.length === 0) {
+                    return currentDir;
+                }
+
+                const canReachFood = this.hasPathToFood(state);
+
+                if (canReachFood) {
+                    let bestDirection = safeDirections[0];
+                    let bestScore = -Infinity;
+
+                    for (const dir of safeDirections) {
+                        const nextPos = this.getNextPosition(head, dir);
+                        const score = this.evaluateDirection(nextPos, food);
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestDirection = dir;
+                        }
+                    }
+
+                    return bestDirection;
+                }
+
+                let safestDirection = safeDirections[0];
+                let maxDistance = -Infinity;
+
+                for (const dir of safeDirections) {
+                    const nextPos = this.getNextPosition(head, dir);
+                    const avgDistance = this.getAverageDistanceFromSnake(nextPos, snake);
+
+                    if (avgDistance > maxDistance) {
+                        maxDistance = avgDistance;
+                        safestDirection = dir;
+                    }
+                }
+
+                return safestDirection;
+            }
+
+            getSafeDirections(state) {
+                const head = state.snake[0];
+                const safeDirections = [];
+
+                for (const dir of this.directions) {
+                    const nextPos = this.getNextPosition(head, dir);
+
+                    if (this.isSafe(nextPos, state)) {
+                        safeDirections.push(dir);
+                    }
+                }
+
+                return safeDirections;
+            }
+
+            isSafe(position, state) {
+                const snake = state.snake;
+
+                if (position.x < 0 || position.x >= CONFIG.GRID_COUNT_X ||
+                    position.y < 0 || position.y >= CONFIG.GRID_COUNT_Y) {
+                    return false;
+                }
+
+                for (let i = 0; i < snake.length - 1; i++) {
+                    if (position.x === snake[i].x && position.y === snake[i].y) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            getNextPosition(head, direction) {
+                switch (direction) {
+                    case 'up': return { x: head.x, y: head.y - 1 };
+                    case 'down': return { x: head.x, y: head.y + 1 };
+                    case 'left': return { x: head.x - 1, y: head.y };
+                    case 'right': return { x: head.x + 1, y: head.y };
+                    default: return { x: head.x, y: head.y };
+                }
+            }
+
+            evaluateDirection(position, food) {
+                const distance = Math.abs(position.x - food.x) + Math.abs(position.y - food.y);
+                return -distance;
+            }
+
+            hasPathToFood(state) {
+                const snake = state.snake;
+                const food = state.food;
+                if (!snake || !food) return false;
+
+                const head = snake[0];
+                const visited = new Set();
+                const queue = [head];
+
+                while (queue.length > 0) {
+                    const current = queue.shift();
+                    const key = `${current.x},${current.y}`;
+
+                    if (visited.has(key)) continue;
+                    visited.add(key);
+
+                    if (current.x === food.x && current.y === food.y) {
+                        return true;
+                    }
+
+                    for (const dir of this.directions) {
+                        const nextPos = this.getNextPosition(current, dir);
+                        const nextKey = `${nextPos.x},${nextPos.y}`;
+
+                        if (!visited.has(nextKey) && this.isSafe(nextPos, state)) {
+                            queue.push(nextPos);
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            getAverageDistanceFromSnake(position, snake) {
+                let totalDistance = 0;
+                for (const segment of snake) {
+                    totalDistance += Math.abs(position.x - segment.x) + Math.abs(position.y - segment.y);
+                }
+                return totalDistance / snake.length;
+            }
+        }
+
+        // ========== 游戏引擎 ==========
+        class Game {
+            constructor() {
+                this.state = {
+                    gameStatus: GameStatus.IDLE,
+                    controlMode: ControlMode.MANUAL,
+                    controlOwner: ControlOwner.MANUAL,
+                    manualOverrideUntil: 0,
+                    score: 0,
+                    bestScore: parseInt(localStorage.getItem(CONFIG.STORAGE_KEYS.BEST_SCORE)) || 0,
+                    leaderboard: this.loadLeaderboard(),
+                    snake: [],
+                    direction: 'right',
+                    nextDirection: 'right',
+                    food: null,
+                    speed: CONFIG.INITIAL_SPEED,
+                    isMobileLayout: false
+                };
+
+                this.renderer = new Renderer('game-canvas');
+                this.autopilot = new Autopilot();
+                this.food = new Food();
+
+                this.gameLoop = null;
+                this.lastFrameTime = 0;
+                this.accumulatedTime = 0;
+
+                this.init();
+            }
+
+            init() {
+                this.state.isMobileLayout = this.detectMobileLayout();
+
+                this.bindEvents();
+                this.showStartScreen();
+                this.updateBestScore();
+                this.renderLeaderboard();
+                this.renderer.clear();
+            }
+
+            detectMobileLayout() {
+                return window.innerWidth <= 768 || 'ontouchstart' in window;
+            }
+
+            bindEvents() {
+                // 键盘事件
+                document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+
+                // 按钮事件
+                document.getElementById('btn-start').addEventListener('click', () => this.start());
+                document.getElementById('btn-pause').addEventListener('click', () => this.pause());
+                document.getElementById('btn-resume').addEventListener('click', () => this.resume());
+                document.getElementById('btn-restart').addEventListener('click', () => this.restart());
+                document.getElementById('btn-toggle-auto').addEventListener('click', () => this.toggleAutoMode());
+
+                // 触控按钮
+                const touchButtons = [
+                    { el: document.getElementById('btn-up'), dir: 'up' },
+                    { el: document.getElementById('btn-down'), dir: 'down' },
+                    { el: document.getElementById('btn-left'), dir: 'left' },
+                    { el: document.getElementById('btn-right'), dir: 'right' }
+                ];
+
+                touchButtons.forEach(btn => {
+                    if (!btn.el) return;
+
+                    btn.el.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this.handleTouch(btn.dir);
+                    }, { passive: false });
+
+                    btn.el.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.handleTouch(btn.dir);
+                    });
+                });
+            }
+
+            handleKeyDown(e) {
+                // 空闲状态按方向键开始
+                if (this.state.gameStatus === GameStatus.IDLE) {
+                    const key = e.key;
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(key)) {
+                        this.start();
+                        return;
+                    }
+                }
+
+                // 暂停时按空格继续
+                if (this.state.gameStatus === GameStatus.PAUSED) {
+                    if (e.code === 'Space' || e.code === 'Enter') {
+                        e.preventDefault();
+                        this.resume();
+                        return;
+                    }
+                }
+
+                // 运行中处理方向
+                if (this.state.gameStatus !== GameStatus.RUNNING &&
+                    this.state.gameStatus !== GameStatus.PAUSED) {
+                    return;
+                }
+
+                // 暂停时按空格暂停
+                if (this.state.gameStatus === GameStatus.RUNNING && e.code === 'Space') {
+                    e.preventDefault();
+                    this.pause();
+                    return;
+                }
+
+                const key = e.key;
+                let newDirection = null;
+
+                switch (key) {
+                    case 'ArrowUp': case 'w': case 'W':
+                        newDirection = 'up'; break;
+                    case 'ArrowDown': case 's': case 'S':
+                        newDirection = 'down'; break;
+                    case 'ArrowLeft': case 'a': case 'A':
+                        newDirection = 'left'; break;
+                    case 'ArrowRight': case 'd': case 'D':
+                        newDirection = 'right'; break;
+                    default:
+                        return;
+                }
+
+                if (newDirection) {
+                    e.preventDefault();
+                    this.processInput(newDirection);
+                }
+            }
+
+            handleTouch(direction) {
+                if (this.state.gameStatus !== GameStatus.RUNNING) return;
+                this.processInput(direction);
+
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            }
+
+            processInput(newDirection) {
+                const currentDirection = this.state.direction;
+
+                if (this.isOppositeDirection(newDirection, currentDirection)) {
+                    return;
+                }
+
+                this.state.nextDirection = newDirection;
+
+                if (this.state.controlMode === ControlMode.AUTO) {
+                    this.state.controlOwner = ControlOwner.AUTO_WITH_MANUAL_OVERRIDE;
+                    this.state.manualOverrideUntil = Date.now() + CONFIG.MANUAL_OVERRIDE_DURATION;
+                    this.updateControlIndicator();
+                }
+            }
+
+            isOppositeDirection(dir1, dir2) {
+                const opposites = { 'up': 'down', 'down': 'up', 'left': 'right', 'right': 'left' };
+                return opposites[dir1] === dir2;
+            }
+
+            loadLeaderboard() {
+                try {
+                    const data = localStorage.getItem(CONFIG.STORAGE_KEYS.LEADERBOARD);
+                    return data ? JSON.parse(data) : [];
+                } catch {
+                    return [];
+                }
+            }
+
+            saveLeaderboard() {
+                try {
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.LEADERBOARD, JSON.stringify(this.state.leaderboard));
+                } catch (e) {
+                    console.error('Failed to save leaderboard:', e);
+                }
+            }
+
+            start() {
+                if (this.state.gameStatus === GameStatus.RUNNING) return;
+
+                this.resetGame();
+
+                this.state.gameStatus = GameStatus.RUNNING;
+                this.hideStartScreen();
+                this.hideGameOver();
+
+                this.spawnFood();
+                this.renderer.render(this.state);
+
+                this.startGameLoop();
+            }
+
+            pause() {
+                if (this.state.gameStatus !== GameStatus.RUNNING) return;
+                this.state.gameStatus = GameStatus.PAUSED;
+                document.getElementById('pause-overlay').style.display = 'flex';
+            }
+
+            resume() {
+                if (this.state.gameStatus !== GameStatus.PAUSED) return;
+                this.state.gameStatus = GameStatus.RUNNING;
+                document.getElementById('pause-overlay').style.display = 'none';
+                this.lastFrameTime = performance.now();
+            }
+
+            restart() {
+                this.hideGameOver();
+                this.hideStartScreen();
+                this.start();
+            }
+
+            toggleAutoMode() {
+                if (this.state.controlMode === ControlMode.MANUAL) {
+                    this.state.controlMode = ControlMode.AUTO;
+                    this.state.controlOwner = ControlOwner.AUTO;
+                } else {
+                    this.state.controlMode = ControlMode.MANUAL;
+                    this.state.controlOwner = ControlOwner.MANUAL;
+                }
+                this.updateControlIndicator();
+                this.updateAutoButton();
+            }
+
+            resetGame() {
+                this.state.score = 0;
+                this.state.snake = this.createInitialSnake();
+                this.state.direction = 'right';
+                this.state.nextDirection = 'right';
+                this.state.speed = CONFIG.INITIAL_SPEED;
+                this.state.controlOwner = ControlOwner.MANUAL;
+                this.state.manualOverrideUntil = 0;
+
+                if (this.state.controlMode !== ControlMode.AUTO) {
+                    this.state.controlMode = ControlMode.MANUAL;
+                }
+
+                this.food.reset();
+                document.getElementById('current-score').textContent = '0';
+            }
+
+            createInitialSnake() {
+                const startX = Math.floor(CONFIG.GRID_COUNT_X / 2);
+                const startY = Math.floor(CONFIG.GRID_COUNT_Y / 2);
+
+                return [
+                    { x: startX, y: startY },
+                    { x: startX - 1, y: startY },
+                    { x: startX - 2, y: startY }
+                ];
+            }
+
+            spawnFood() {
+                const newFood = this.food.generate(this.state.snake);
+                if (newFood) {
+                    this.state.food = newFood;
+                } else {
+                    this.gameOver(true);
+                }
+            }
+
+            startGameLoop() {
+                this.lastFrameTime = performance.now();
+                this.gameLoop = requestAnimationFrame((t) => this.update(t));
+            }
+
+            update(currentTime) {
+                if (this.state.gameStatus !== GameStatus.RUNNING) {
+                    return;
+                }
+
+                const deltaTime = currentTime - this.lastFrameTime;
+                this.lastFrameTime = currentTime;
+                this.accumulatedTime += deltaTime;
+
+                if (this.accumulatedTime >= this.state.speed) {
+                    this.accumulatedTime -= this.state.speed;
+                    this.gameTick();
+                }
+
+                this.gameLoop = requestAnimationFrame((t) => this.update(t));
+            }
+
+            gameTick() {
+                this.processControl();
+
+                this.state.direction = this.state.nextDirection;
+
+                const head = this.state.snake[0];
+                const newHead = this.getNextPosition(head, this.state.direction);
+
+                if (this.checkCollision(newHead)) {
+                    this.gameOver();
+                    return;
+                }
+
+                this.state.snake.unshift(newHead);
+
+                if (this.state.food &&
+                    newHead.x === this.state.food.x &&
+                    newHead.y === this.state.food.y) {
+                    this.state.score += CONFIG.FOOD_SCORE;
+                    document.getElementById('current-score').textContent = this.state.score;
+
+                    if (this.state.speed > CONFIG.MIN_SPEED) {
+                        this.state.speed -= CONFIG.SPEED_DECREASE;
+                    }
+
+                    this.spawnFood();
+                } else {
+                    this.state.snake.pop();
+                }
+
+                this.renderer.render(this.state);
+            }
+
+            processControl() {
+                const now = Date.now();
+
+                if (this.state.controlOwner === ControlOwner.AUTO_WITH_MANUAL_OVERRIDE) {
+                    if (now > this.state.manualOverrideUntil) {
+                        this.state.controlOwner = ControlOwner.AUTO;
+                        this.updateControlIndicator();
+                    }
+                }
+
+                if (this.state.controlMode === ControlMode.AUTO &&
+                    this.state.controlOwner === ControlOwner.AUTO) {
+                    const autoDirection = this.autopilot.getSmartAutoDirection(this.state);
+
+                    if (!this.isOppositeDirection(autoDirection, this.state.direction)) {
+                        this.state.nextDirection = autoDirection;
+                    }
+                }
+            }
+
+            getNextPosition(head, direction) {
+                switch (direction) {
+                    case 'up': return { x: head.x, y: head.y - 1 };
+                    case 'down': return { x: head.x, y: head.y + 1 };
+                    case 'left': return { x: head.x - 1, y: head.y };
+                    case 'right': return { x: head.x + 1, y: head.y };
+                    default: return { x: head.x, y: head.y };
+                }
+            }
+
+            checkCollision(position) {
+                if (position.x < 0 || position.x >= CONFIG.GRID_COUNT_X ||
+                    position.y < 0 || position.y >= CONFIG.GRID_COUNT_Y) {
+                    return true;
+                }
+
+                for (let i = 0; i < this.state.snake.length - 1; i++) {
+                    if (position.x === this.state.snake[i].x &&
+                        position.y === this.state.snake[i].y) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            gameOver(isWin = false) {
+                this.state.gameStatus = GameStatus.GAMEOVER;
+
+                if (this.state.score > this.state.bestScore) {
+                    this.state.bestScore = this.state.score;
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.BEST_SCORE, this.state.score.toString());
+                }
+
+                const record = {
+                    score: this.state.score,
+                    createdAt: Date.now(),
+                    mode: this.state.controlMode
+                };
+
+                this.state.leaderboard.push(record);
+                this.state.leaderboard.sort((a, b) => {
+                    if (b.score !== a.score) return b.score - a.score;
+                    return b.createdAt - a.createdAt;
+                });
+
+                if (this.state.leaderboard.length > CONFIG.LEADERBOARD_SIZE) {
+                    this.state.leaderboard = this.state.leaderboard.slice(0, CONFIG.LEADERBOARD_SIZE);
+                }
+
+                this.saveLeaderboard();
+
+                this.updateBestScore();
+                this.renderLeaderboard();
+
+                document.getElementById('final-score').textContent = this.state.score;
+                document.getElementById('gameover-screen').style.display = 'flex';
+
+                if (this.gameLoop) {
+                    cancelAnimationFrame(this.gameLoop);
+                }
+            }
+
+            showStartScreen() {
+                document.getElementById('start-screen').style.display = 'flex';
+            }
+
+            hideStartScreen() {
+                document.getElementById('start-screen').style.display = 'none';
+            }
+
+            hideGameOver() {
+                document.getElementById('gameover-screen').style.display = 'none';
+            }
+
+            updateBestScore() {
+                document.getElementById('best-score').textContent = this.state.bestScore;
+            }
+
+            renderLeaderboard() {
+                const el = document.getElementById('leaderboard');
+
+                if (!this.state.leaderboard || this.state.leaderboard.length === 0) {
+                    el.innerHTML = '<li class="empty">暂无记录</li>';
+                    return;
+                }
+
+                const html = this.state.leaderboard.map((record, index) => {
+                    const date = new Date(record.createdAt);
+                    const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    const modeLabel = record.mode === 'auto' ? '🤖' : '👤';
+
+                    return `
+                        <li>
+                            <span class="rank">#${index + 1}</span>
+                            <span class="score">${record.score}</span>
+                            <span class="mode">${modeLabel}</span>
+                            <span class="date">${dateStr}</span>
+                        </li>
+                    `;
+                }).join('');
+
+                el.innerHTML = html;
+            }
+
+            updateControlIndicator() {
+                const indicator = document.getElementById('control-indicator');
+                let text = '';
+                let className = '';
+
+                if (this.state.controlMode === ControlMode.AUTO) {
+                    if (this.state.controlOwner === ControlOwner.AUTO_WITH_MANUAL_OVERRIDE) {
+                        text = '👤 手动控制中';
+                        className = 'manual';
+                    } else {
+                        text = '🤖 自动控制中';
+                        className = 'auto';
+                    }
+                } else {
+                    text = '👤 手动控制';
+                    className = 'manual';
+                }
+
+                indicator.textContent = text;
+                indicator.className = 'control-indicator ' + className;
+            }
+
+            updateAutoButton() {
+                const btn = document.getElementById('btn-toggle-auto');
+
+                if (this.state.controlMode === ControlMode.AUTO) {
+                    btn.textContent = '🤖 自动已开启';
+                    btn.classList.add('active');
+                } else {
+                    btn.textContent = '🤖 开启自动';
+                    btn.classList.remove('active');
+                }
+            }
+        }
+
+        // 启动游戏
+        window.game = new Game();
+    </script>
+</body>
+</html>
