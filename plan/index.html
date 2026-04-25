@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>两周训练计划</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            page: '#171717',
+            panel: '#202020',
+            head: '#1e1e1e',
+            grid: '#3a3a3a',
+            purple: '#44304f',
+            green: '#274433',
+            text: '#f5f5f5',
+            muted: '#d7d7d7'
+          },
+          boxShadow: {
+            soft: '0 20px 60px rgba(0,0,0,.35)'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-page text-text min-h-screen font-sans">
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-6">
+      <h1 class="text-2xl font-semibold tracking-tight">两周训练计划</h1>
+      <p class="text-sm text-muted/75 mt-1">参考图示整理成纯前端表格视图</p>
+    </header>
+
+    <section class="rounded-2xl overflow-hidden border border-grid bg-panel shadow-soft">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] border-collapse text-left text-[15px]">
+          <thead>
+            <tr class="bg-head text-white">
+              <th class="border-b border-r border-grid px-4 py-3 font-semibold">两周出勤8天</th>
+              <th class="border-b border-r border-grid px-4 py-3 font-semibold">主项预计80min</th>
+              <th class="border-b border-r border-grid px-4 py-3 font-semibold">次项预计20min</th>
+              <th class="border-b border-grid px-4 py-3 font-semibold">有氧</th>
+            </tr>
+          </thead>
+          <tbody id="plan-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const rows = [
+      ['周日 双休', '胸部', '三头', '25min', 'purple'],
+      ['周一', '背部', '二头', '25min', 'purple'],
+      ['周二', '肩部', '腹部', '25min', 'purple'],
+      ['周三', '/', '/', '休息', 'green'],
+      ['周四', '胸部', '三头', '25min', 'purple'],
+      ['周五', '背部', '二头', '25min', 'purple'],
+      ['周六 单休', '/', '/', '休息', 'green'],
+      ['周日 单休', '/', '/', '休息', 'green'],
+      ['周一', '胸部', '三头', '25min', 'purple'],
+      ['周二', '臀腿', '腹部', '25min', 'purple'],
+      ['周三', '/', '/', '休息', 'green'],
+      ['周四', '背部', '二头', '25min', 'purple'],
+      ['周五 双休', '/', '/', '休息', 'green'],
+      ['周六 双休', '/', '/', '休息', 'green']
+    ];
+
+    const body = document.getElementById('plan-body');
+
+    rows.forEach(([day, main, secondary, cardio, tone]) => {
+      const tr = document.createElement('tr');
+      tr.className = tone === 'green' ? 'bg-green' : 'bg-purple';
+      tr.innerHTML = `
+        <td class="border-b border-r border-grid px-4 py-3 font-medium whitespace-nowrap">${day}</td>
+        <td class="border-b border-r border-grid px-4 py-3">${main}</td>
+        <td class="border-b border-r border-grid px-4 py-3">${secondary}</td>
+        <td class="border-b border-grid px-4 py-3">${cardio}</td>
+      `;
+      body.appendChild(tr);
+    });
+  </script>
+</body>
+</html>
